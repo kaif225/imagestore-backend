@@ -1,0 +1,63 @@
+trigger:
+  branches:
+    include:
+    - main 
+  paths:
+    exclude:
+    - 'manifest'
+
+resources:
+- repo: self
+
+variables:
+  # Container registry service connection established during pipeline creation
+  dockerRegistryServiceConnection: '85263f02-66cb-4a93-8e7d-02b4e866acb0'
+  imageRepository: 'imagestorebackend'
+  containerRegistry: 'kaifpersonal.azurecr.io'
+  dockerfilePath: '$(Build.SourcesDirectory)/app/Dockerfile'
+  tag: '$(Build.BuildId)'
+  manifestFile: 'manifest/deployment.yml'
+
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
+
+stages:
+- stage: Build
+  displayName: Build and push stage
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - checkout: self 
+      persistCredentials: true 
+      
+    - task: Docker@2
+      displayName: Build and push an image to container registry
+      inputs:
+        command: buildAndPush
+        repository: $(imageRepository)
+        dockerfile: $(dockerfilePath)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
+
+    - script: |
+       echo "Updating deployment manifest with new image tag..."
+       sed -i "s#\(image: $(containerRegistry)/$(imageRepository):\).*#\1$(tag)#" $(manifestFile)
+       echo "Updated manifest:"
+       cat $(manifestFile)
+      displayName: Update image tag in deployment.yml
+          
+    - script: |
+        git config user.name "azure-pipelines"
+        git config user.email "azure-pipelines@devops"
+        git checkout -B main 
+        git add $(manifestFile)
+        git commit -m "Update image tag to $(tag) [skip ci]" || echo "No changes to commit"
+        git push origin main
+      displayName: Commit updated manifest
+      env:
+        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+        

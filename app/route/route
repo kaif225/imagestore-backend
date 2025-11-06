@@ -1,0 +1,18 @@
+// package route
+
+// import (
+// 	"ginmongo/controller"
+
+// 	"github.com/gin-gonic/gin"
+// )
+
+// func Route(router *gin.Engine) {
+
+// 	router.POST("/upload/:category", controller.UploadImage)
+// 	router.GET("/images/:category", controller.GetImagesByCategory)
+// 	router.GET("/images", controller.GetAllImages)
+// 	router.GET("/images/search", controller.GetImagesByName)
+// 	router.POST("/registration", controller.RegisterUser)
+// 	router.POST("/login", controller.Login)
+
+// }

@@ -1,0 +1,17 @@
+services:
+  backend:
+    image: imagestore 
+    container_name: imagestorenew
+    ports:
+     - "8007:8007"
+    env_file:
+     - ./.env
+    networks:
+     - test 
+
+networks:
+  test:
+    driver: bridge 
+    external: true
+      
+    
