@@ -314,7 +314,8 @@ func ForgetPassword(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Error updating token"})
 		return
 	}
-	resetURL := fmt.Sprintf("http://localhost:8007/users/resetpassword/reset/%s", token)
+	frontendUri := os.Getenv("FRONTEND_URI")
+	resetURL := fmt.Sprintf("%v/users/resetpassword/reset/%s", frontendUri, token)
 	message := fmt.Sprintf("Forgot your password ? Reset using the following link: \n%s\n If you didn't request the password reset ignore this message", resetURL)
 
 	smtpUser := os.Getenv("SMTP_USER")
