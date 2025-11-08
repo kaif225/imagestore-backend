@@ -385,7 +385,7 @@ func ResetPassword(c *gin.Context) {
 		ConfirmPassword string `json:"confirm_password" validate:"required,max=16,min=6"`
 	}
 
-	err := c.ShouldBindJSON(&resetPass)
+	err := c.ShouldBind(&resetPass)
 	if err != nil {
 		log.Println(err)
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid RequestBody"})
